@@ -32,3 +32,4 @@ The full ABID of \~500,000 images can be found <a ref="https://registry.opendata
 - Refactor code to include type hints and function documentation.
 - Move code to output graphs to a separate python file.
 - Add analysis of transforms.
+- Add normalization as an SM processing job.
