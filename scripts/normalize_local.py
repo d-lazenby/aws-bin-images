@@ -3,14 +3,15 @@ import torchvision
 from torchvision import transforms
 from torch.utils.data import DataLoader
 import tqdm
+from typing import Tuple
 
 import os
 import time
 import json
 
 
-def get_data_loader(data_dir, batch_size=64):
-    transform = transform = transforms.Compose([
+def get_data_loader(data_dir: str, batch_size: int = 64) -> DataLoader:
+    transform = transforms.Compose([
             transforms.RandomResizedCrop((224, 224)),
             transforms.RandomHorizontalFlip(),
             transforms.RandomGrayscale(p=0.15),
@@ -40,7 +41,7 @@ def get_data_loader(data_dir, batch_size=64):
     return data_loader
 
 
-def batch_mean_and_std(data_loader, max_images=10000):
+def batch_mean_and_std(data_loader: DataLoader, max_images: int = 10000) -> Tuple[torch.Tensor, torch.Tensor]:
     num_images = 0
     count = 0
     mean = torch.empty(3)
@@ -66,7 +67,7 @@ def batch_mean_and_std(data_loader, max_images=10000):
     return mean_final, std_final
 
 
-def main():
+def main() -> None:
     tick = time.time()
     data_dir = "binImages/train"
 
@@ -80,6 +81,7 @@ def main():
 
     # Make local directory and store mean and std
     path = 'normalization'
+    # If directory doesn't exist yet, make a new one
     if not os.path.exists(path):
         os.makedirs(path)
         print(f"Directory {path} created")
