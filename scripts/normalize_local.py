@@ -7,7 +7,17 @@ from typing import Tuple
 
 import os
 import time
-import json
+import logging
+import datetime
+
+log_path = "./transform_output"
+if not os.path.exists(log_path):
+    os.makedirs(log_path)
+
+filename = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+logging.basicConfig(filename=os.path.join(log_path, f'{filename}.log'),
+                    level=logging.DEBUG,
+                    format='%(asctime)s — %(message)s')
 
 
 def get_data_loader(data_dir: str, batch_size: int = 64) -> DataLoader:
@@ -37,6 +47,7 @@ def get_data_loader(data_dir: str, batch_size: int = 64) -> DataLoader:
     data_loader = DataLoader(image_data,
                              batch_size=batch_size,
                              num_workers=1)
+    logging.info(f"{transform}")
 
     return data_loader
 
@@ -69,29 +80,15 @@ def batch_mean_and_std(data_loader: DataLoader, max_images: int = 10000) -> Tupl
 
 def main() -> None:
     tick = time.time()
-    data_dir = "binImages/train"
-
+    data_dir = "data/train"
+    logging.info(f"For data at {data_dir} with transform:")
     data_loader = get_data_loader(data_dir)
     mean, std = batch_mean_and_std(data_loader)
-    normalization = {"Mean": str(mean), "Std": str(std)}
+    logging.info(f"Standardization metrics are Mean: {mean} and Std: {std}")
 
     tock = time.time()
     time_to_run = tock - tick
     print(f"Program took {time_to_run} to process dataset at {data_dir}.")
-
-    # Make local directory and store mean and std
-    path = 'normalization'
-    # If directory doesn't exist yet, make a new one
-    if not os.path.exists(path):
-        os.makedirs(path)
-        print(f"Directory {path} created")
-        with open(os.path.join(path, 'imp3.json'), 'w') as f:
-            json.dump(normalization, f)
-            print(f"Mean and std written to {os.path.join(path, 'imp3.json')}")
-    else:
-        with open(os.path.join(path, 'imp3.json'), 'w') as f:
-            json.dump(normalization, f)
-            print(f"Mean and std written to {os.path.join(path, 'imp3.json')}")
 
 
 if __name__ == "__main__":
